@@ -123,3 +123,7 @@ dmypy.json
 
 # Pyre type checker
 .pyre/
+
+# data source
+correctmainFrame20052015.csv
+playground.py
