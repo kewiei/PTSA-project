@@ -127,3 +127,5 @@ dmypy.json
 # data source
 correctmainFrame20052015.csv
 playground.py
+playground.ipynb
+20052007Small.csv
