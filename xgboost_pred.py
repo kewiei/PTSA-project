@@ -1,11 +1,11 @@
-import tensorflow as tf
-from tensorflow import keras
-from tensorflow.keras import layers
 import time
 import pandas as pd
 import gc
 import numpy as np
 import os
+import xgboost as xgb
+from sklearn.metrics import accuracy_score,r2_score
+import matplotlib.pyplot as plt
 
 starttime = time.time()
 # read in data
@@ -19,19 +19,6 @@ features = mainFrame.iloc[:,:-7]
 gc.collect()
 endtime = time.time()
 print("It takes {}s to load data".format(endtime-starttime))
-
-
-def create_model(input_dims):
-    model = keras.Sequential([
-        layers.Dense(256, activation='relu', input_shape=(input_dims,)),
-        layers.Dense(128, activation='relu'),
-        layers.Dense(32, activation='sigmoid'),
-        layers.Dense(1)
-    ])
-    model.compile(optimizer=keras.optimizers.Adam(),
-                 loss=keras.losses.binary_crossentropy,
-                 metrics=['accuracy'])
-    return model
 
 def trainAndPredictOneYear(year):
     this_year = '{}'.format(year)
@@ -55,17 +42,22 @@ def trainAndPredictOneYear(year):
     y_test=y_test*1
     y_test=y_test.astype(int)
 
-    input_dims=x_train.shape[1]
+    dtrain = xgb.DMatrix(x_train, label=y_train)
+    dvalid =xgb.DMatrix(x_test, label=y_test)
+    # specify parameters via map
+    watchlist = [(dvalid, 'eval'), (dtrain, 'train')]
+    params = {'max_depth':2, 'eta':1, 'objective':'binary:logistic' }
+    num_round = 2
     #retrain the entire model
-    model = create_model(input_dims)
-    model.fit(x_train, y_train, batch_size=50, epochs=50, 
-          validation_split=0.1, verbose=1)
+    gbm_model = xgb.train(params, dtrain, num_round,
+                          verbose_eval=True)
+    result = gbm_model.predict(dvalid,
+                                    ntree_limit=gbm_model.best_iteration + 1)
     
-    result = model.predict(x_test)
     result_holder = targets.loc[maskTest,'ztargetMedian5'].copy()
     result_holder = pd.DataFrame(result_holder)
     result_holder.loc[:,'ztargetMedian5'] = result
-    result_holder.to_csv('mlp_predict{}basedon{}.csv'.format(next_year,this_year))
+    result_holder.to_csv('xgboost_predict{}basedon{}.csv'.format(next_year,this_year))
     
 
 #for this_year in range(2005,2014):

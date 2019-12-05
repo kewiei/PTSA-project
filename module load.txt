@@ -1,4 +1,4 @@
 module load cuda/10.1.105
 module load cudnn/10.0v7.6.2.24
 module load tensorflow/python3.6/1.5.0
-pip install pandas,xgboost,hyperopt,sklearn,matplotlib
+pip install pandas xgboost hyperopt scikit-learn matplotlib

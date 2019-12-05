@@ -94,7 +94,7 @@ def optimize(trials=None,
         # to the maxium number. 
 #         'nthread': 3,
         'booster': 'gbtree',
-        'tree_method': 'gpu_hist',
+        'tree_method': 'exact',
         'silent': 1,
         'seed': random_state
     }

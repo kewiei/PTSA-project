@@ -128,5 +128,8 @@ dmypy.json
 playground.py
 playground.ipynb
 *.csv
+*.txt
+*.out
 Small.csv
 trancateDataset.ipynb
+mlp_result/
