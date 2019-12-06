@@ -9,7 +9,7 @@ import os
 
 starttime = time.time()
 # read in data
-mainFrame=pd.read_csv('/scratch/ap5891/correctmainFrame20052015.csv',parse_dates=['date'])
+mainFrame=pd.read_csv('20052007Small.csv',parse_dates=['date'])
 
 mainFrame.set_index(['entityID','date'],inplace=True)
 
@@ -25,8 +25,8 @@ def create_model(input_dims):
     model = keras.Sequential([
         layers.Dense(256, activation='relu', input_shape=(input_dims,)),
         layers.Dense(128, activation='relu'),
-        layers.Dense(32, activation='sigmoid'),
-        layers.Dense(1)
+        layers.Dense(32, activation='relu'),
+        layers.Dense(1, activation='sigmoid')
     ])
     model.compile(optimizer=keras.optimizers.Adam(),
                  loss=keras.losses.binary_crossentropy,
@@ -58,7 +58,7 @@ def trainAndPredictOneYear(year):
     input_dims=x_train.shape[1]
     #retrain the entire model
     model = create_model(input_dims)
-    model.fit(x_train, y_train, batch_size=50, epochs=50, 
+    model.fit(x_train, y_train, batch_size=50, epochs=1, 
           validation_split=0.1, verbose=1)
     
     result = model.predict(x_test)
@@ -69,5 +69,5 @@ def trainAndPredictOneYear(year):
     
 
 #for this_year in range(2005,2014):
-for this_year in [2005,2014]:
+for this_year in [2005]:
     trainAndPredictOneYear(this_year)
