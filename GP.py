@@ -41,6 +41,7 @@ maskTrain=(mainFrame.index.get_level_values(1)>= '2005-01-01') & (mainFrame.inde
 x_train=np.array(features[maskTrain])
 y_train=np.array(targets['ztargetMedian5'][maskTrain])
 x_train[np.isinf(x_train)]=100000000
+x_train=np.log(1+x_train)
 y_train=y_train*1
 y_train=y_train.astype(int)
 
@@ -65,6 +66,7 @@ for ii in years:
     x_train=np.array(features[maskTrain])
     y_train=np.array(targets['ztargetMedian5'][maskTrain])
     x_train[np.isinf(x_train)]=100000000
+    x_train=np.log(1+x_train)
     y_train=y_train*1
     y_train=y_train.astype(int)
     model = GaussianProcessClassifier(kernel=kernel)
@@ -72,6 +74,7 @@ for ii in years:
     maskTest=(mainFrame.index.get_level_values(1) >= str(ii+1)+'-01-01') & (mainFrame.index.get_level_values(1) <= str(ii+1)+'-12-31')
     test=features[maskTest]
     test[np.isinf(test)]=100000000
+    test=np.log(1+test)
     pred1=model.predict_proba(test)
     pred1=pd.DataFrame(pred1)
     pred1.set_index(features[maskTest].index,inplace=True)
