@@ -9,7 +9,7 @@ import os
 
 starttime = time.time()
 # read in data
-mainFrame=pd.read_csv('20052007Small.csv',parse_dates=['date'])
+mainFrame=pd.read_csv('/scratch/ap5891/correctmainFrame20052015.csv',parse_dates=['date'])
 
 mainFrame.set_index(['entityID','date'],inplace=True)
 
@@ -23,9 +23,11 @@ print("It takes {}s to load data".format(endtime-starttime))
 
 def create_model(input_dims):
     model = keras.Sequential([
-        layers.Dense(256, activation='relu', input_shape=(input_dims,)),
-        layers.Dense(128, activation='relu'),
-        layers.Dense(32, activation='relu'),
+        layers.Dense(30, activation='relu',kernel_initializer='glorot_normal',bias_initializer='glorot_normal', input_shape=(input_dims,)),
+        layers.BatchNormalization(momentum=0.9),
+        layers.Dense(30, activation='relu',kernel_initializer='glorot_normal',bias_initializer='glorot_normal'),
+        layers.BatchNormalization(momentum=0.9),
+        layers.Dense(10, activation='relu',kernel_initializer='glorot_normal',bias_initializer='glorot_normal'),
         layers.Dense(1, activation='sigmoid')
     ])
     model.compile(optimizer=keras.optimizers.Adam(),
@@ -54,20 +56,18 @@ def trainAndPredictOneYear(year):
     x_test[np.isinf(x_test)]=100000000
     y_test=y_test*1
     y_test=y_test.astype(int)
-
+    
     input_dims=x_train.shape[1]
     #retrain the entire model
     model = create_model(input_dims)
-    model.fit(x_train, y_train, batch_size=50, epochs=1, 
+    model.fit(x_train, y_train, batch_size=500, epochs=200, 
           validation_split=0.1, verbose=1)
     
     result = model.predict(x_test)
     result_holder = targets.loc[maskTest,'ztargetMedian5'].copy()
     result_holder = pd.DataFrame(result_holder)
     result_holder.loc[:,'ztargetMedian5'] = result
-    result_holder.to_csv('mlp_predict{}basedon{}.csv'.format(next_year,this_year))
-    
+    result_holder.to_csv('mlp_predict{}basedon{}.csv'.format(next_year,this_year))    
 
-#for this_year in range(2005,2014):
-for this_year in [2005]:
+for this_year in range(2005,2015):
     trainAndPredictOneYear(this_year)

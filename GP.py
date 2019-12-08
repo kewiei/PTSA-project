@@ -13,6 +13,8 @@ to a new file, set the file path of that file, but don't change the name of the 
 
 import pandas as pd
 import numpy as np
+import datetime as dt
+
 
 import matplotlib.pyplot as plt
 idx=pd.IndexSlice
@@ -20,17 +22,16 @@ from sklearn.metrics import make_scorer, r2_score,accuracy_score,precision_score
 from sklearn.externals import joblib
 from sklearn.model_selection import RandomizedSearchCV
 import gc
-from sklearn.linear_model import LogisticRegression
-from sklearn import preprocessing
+from sklearn.gaussian_process import GaussianProcessClassifier
+from sklearn.gaussian_process.kernels import RBF,ExpSineSquared
 
 scoring = {'AUC':'roc_auc','Accuracy':make_scorer(accuracy_score)}
-mainFrame=pd.read_csv('/scratch/ap5891/correctmainFrame20052015.csv', parse_dates=['date'])
+mainFrame=pd.read_csv(r'/beegfs/sr4376/Finance Data/CNN-LSTM Data/TransformedData-LSTM.csv', parse_dates=['Date'])
 
-mainFrame.set_index(['entityID','date'],inplace=True)
-mainFrame.dropna(axis=0,inplace=True)
+mainFrame.set_index(['entityID','Date'],inplace=True)
 mainFrame.sort_index(inplace=True)
-targets=mainFrame.iloc[:,-7:]
-features = mainFrame.iloc[:,:-7]
+targets=mainFrame.iloc[:,-1:]
+features = mainFrame.iloc[:,:-1]
 gc.collect()
 
 '''first we do hyperparameter training, then save the hyperparamters and then train and predict all years'''
@@ -44,9 +45,9 @@ y_train=y_train*1
 y_train=y_train.astype(int)
 
 
-params = {"penalty": ["l1", "l2", "elasticnet"], "dual":[True, False], "fit_intercept": [True, False], "C": np.arange(1,5,0.5), "solver": ["newton-cg", "lbfgs", "liblinear", "sag", "saga"],"l1_ratio": np.arange(0,1.25,0.25)}
+params = {"kernel": [RBF(), ExpSineSquared()]}
 
-model = LogisticRegression()
+model = GaussianProcessClassifier()
 
 random = RandomizedSearchCV(model, params)
 
@@ -55,12 +56,7 @@ random.fit(x_train, y_train)
 best_params = random.best_params_
 
 #save parameters
-penalty = best_params["penalty"]
-dual = best_params["dual"]
-fit_intercept = best_params["fit_intercept"]
-C= best_params["C"]
-solver = best_params["solver"]
-l1_ratio = best_params["l1_ratio"]
+kernel = best_params["kernel"]
 
 #Now we train, predict and save the predictions
 years = np.arange(2005, 2015)
@@ -71,7 +67,7 @@ for ii in years:
     x_train[np.isinf(x_train)]=100000000
     y_train=y_train*1
     y_train=y_train.astype(int)
-    model = LogisticRegression(penalty=penalty, dual=dual, fit_intercept=fit_intercept, C=C, solver=solver, l1_ratio=l1_ratio)
+    model = GaussianProcessClassifier(kernel=kernel)
     model.fit(x_train, y_train)
     maskTest=(mainFrame.index.get_level_values(1) >= str(ii+1)+'-01-01') & (mainFrame.index.get_level_values(1) <= str(ii+1)+'-12-31')
     test=features[maskTest]
@@ -79,7 +75,7 @@ for ii in years:
     pred1=model.predict_proba(test)
     pred1=pd.DataFrame(pred1)
     pred1.set_index(features[maskTest].index,inplace=True)
-    pred1.to_csv('LogRegPred{}basedon{}.csv'.format(str(ii+1),str(ii)))
+    pred1.to_csv('GPPred{}basedon{}.csv'.format(str(ii+1),str(ii)))
     gc.collect()
     
     

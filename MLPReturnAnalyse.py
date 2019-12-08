@@ -1,38 +1,28 @@
-# -*- coding: utf-8 -*-
-"""
-Created on Thu Apr 18 20:14:46 2019
-
-@author: Steff
-"""
-
 import pandas as pd
 import numpy as np
 idx=pd.IndexSlice
-mainFrame=pd.read_csv(r'C:\comp\FeatureData\DataClean\correctmainFrame20052011.csv',parse_dates=['date'])
-#model = joblib.load(r'C:\Hedge Fund Project\training\modelv1.plk')
+mainFrame=pd.read_csv('/scratch/ap5891/correctmainFrame20052015.csv',parse_dates=['date'])
 
 mainFrame.set_index(['entityID','date'],inplace=True)
 #mainFrame=mainFrame20052018
-mainFrame.dropna(axis=0,inplace=True)
 mainFrame.sort_index(inplace=True)
 features = mainFrame.ix[:,:-7]
 mainFrame=[]
 returns=features[['return1','return2']]
 features=[]
 pred1 = None
-months = np.arange(1,13)
-for jj in months:
-    
-    
-    tmpPred=pd.read_csv(r'C:\comp\savePredicitons\2011 Tests\smallModelPredicitons1\predsmallRF2010year' + str(jj) + 'Month.csv',parse_dates=['date'])
+
+for year in range(2005,2015):
+    this_year = '{}'.format(year)
+    next_year = '{}'.format(year+1)
+    tmpPred=pd.read_csv('mlp_predict{}basedon{}.csv'.format(next_year,this_year),parse_dates=['date'])
     tmpPred.set_index(['entityID','date'],inplace=True)
     tmpPred.sort_index(inplace=True)
     if pred1 is None:
         pred1=tmpPred
     else:
         pred1=pred1.append(tmpPred)
-        
-        
+                
 tradingSetsLong={}
 tradingSetsShort={}
 portfolios={0:[],1:[],2:[],3:[],4:[]}
@@ -57,8 +47,8 @@ for ii in dateVectorPnL[:-1]:
     tomorrow=dateVectorPnL[idxDate+1]
     if counter>4:
         counter=0
-    longStocks=pd.DataFrame(proba.xs(ii,axis=0,level=1,drop_level=False)['Long'].nlargest(stockNumber))
-    shortStocks=pd.DataFrame(proba.xs(ii,axis=0,level=1,drop_level=False)['Long'].nsmallest(stockNumber))
+    longStocks=pd.DataFrame(proba.xs(ii,axis=0,level=1,drop_level=False)['ztargetMedian5'].nlargest(stockNumber))
+    shortStocks=pd.DataFrame(proba.xs(ii,axis=0,level=1,drop_level=False)['ztargetMedian5'].nsmallest(stockNumber))
     longEntity=longStocks.index.get_level_values('entityID')
     shortEntity=shortStocks.index.get_level_values('entityID')
     tradingSetsLong[counter]=longEntity
@@ -76,8 +66,7 @@ for ii in dateVectorPnL[:-1]:
     print(portfolios[2][-1])
     print(portfolios[3][-1])
     print(portfolios[4][-1])
-    counter = counter  +1 
-
+    counter = counter  +1  
 portfolios=pd.DataFrame(portfolios)
 portfolios.set_index(dateVectorPnL,inplace=True)
 portfolios.to_csv('MLPReturnAnalyse.csv')

@@ -46,11 +46,12 @@ def trainAndPredictOneYear(year):
     dvalid =xgb.DMatrix(x_test, label=y_test)
     # specify parameters via map
     watchlist = [(dvalid, 'eval'), (dtrain, 'train')]
-    params = {'max_depth':2, 'eta':1, 'objective':'binary:logistic' }
+    param = {'colsample_bytree': 0.7000000000000001, 'eta': 0.47500000000000003, 'max_depth': 0, 'n_estimators': 140.0, 'subsample': 0.9}
     num_round = 2
     #retrain the entire model
-    gbm_model = xgb.train(params, dtrain, num_round,
-                          verbose_eval=True)
+    param['tree_method'] = 'gpu_hist'
+    gbm_model = xgb.train(param, dtrain, num_round,
+                          verbose_eval=True,)
     result = gbm_model.predict(dvalid,
                                     ntree_limit=gbm_model.best_iteration + 1)
     
