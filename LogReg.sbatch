@@ -5,7 +5,7 @@
 #SBATCH --job-name=CPULogReg
 #SBATCH --mail-type=END
 #SBATCH --mail-user=tz1264@nyu.edu
-#SBATCH --output=slurm_CPULogReg_%j.out
+#SBATCH --output=/beegfs/tz1264/slurm_CPULogReg_%j.out
 
 cd /home/tz1264
 module purge
