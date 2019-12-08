@@ -46,14 +46,12 @@ def trainAndPredictOneYear(year):
     dvalid =xgb.DMatrix(x_test, label=y_test)
     # specify parameters via map
     watchlist = [(dvalid, 'eval'), (dtrain, 'train')]
-    param = {'colsample_bytree': 0.7000000000000001, 'eta': 0.47500000000000003, 'max_depth': 0, 'n_estimators': 140.0, 'subsample': 0.9}
-    num_round = 2
+    param = {'booster': 'gbtree', 'colsample_bytree': 0.8500000000000001, 'eta': 0.1, 'eval_metric': 'auc', 'max_depth': 10, 'n_estimators': 150.0, 'objective': 'binary:logistic', 'seed': 314159265, 'silent': 1, 'subsample': 0.9500000000000001}    
+    num_round = 1
     #retrain the entire model
     param['tree_method'] = 'gpu_hist'
-    gbm_model = xgb.train(param, dtrain, num_round,
-                          verbose_eval=True,)
-    result = gbm_model.predict(dvalid,
-                                    ntree_limit=gbm_model.best_iteration + 1)
+    gbm_model = xgb.train(param, dtrain, num_round,evals=watchlist,verbose_eval=True)
+    result = gbm_model.predict(dvalid)
     
     result_holder = targets.loc[maskTest,'ztargetMedian5'].copy()
     result_holder = pd.DataFrame(result_holder)
@@ -61,6 +59,5 @@ def trainAndPredictOneYear(year):
     result_holder.to_csv('xgboost_predict{}basedon{}.csv'.format(next_year,this_year))
     
 
-#for this_year in range(2005,2014):
-for this_year in [2005,2014]:
+for this_year in range(2005,2015):
     trainAndPredictOneYear(this_year)

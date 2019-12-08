@@ -13,7 +13,7 @@ TARGET = 'outcome'
 
 starttime = time.time()
 # read in data
-mainFrame=pd.read_csv('20052007Small.csv',parse_dates=['date'])
+mainFrame=pd.read_csv('/scratch/tz1264/20052007Small.csv',parse_dates=['date'])
 #model = joblib.load(r'C:\Hedge Fund Project\training\modelv1.plk')
 mainFrame.set_index(['entityID','date'],inplace=True)
 #mainFrame=mainFrame20052018
