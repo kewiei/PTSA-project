@@ -7,7 +7,7 @@
 #SBATCH --job-name=GPUxgb_hypara_opt
 #SBATCH --mail-type=END
 #SBATCH --mail-user=tz1264@nyu.edu
-#SBATCH --output=slurm_GPUxgb_hypara_opt_%j.out
+#SBATCH --output=/beegfs/tz1264/slurm_GPUxgb_hypara_opt_%j.out
 
 cd /home/tz1264
 module purge

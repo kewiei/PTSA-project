@@ -67,7 +67,7 @@ for ii in years:
     x_train[np.isinf(x_train)]=100000000
     y_train=y_train*1
     y_train=y_train.astype(int)
-    model = LogisticRegression(penalty=penalty, dual=dual, fit_intercept=fit_intercept, C=C, solver=solver, l1_ratio=l1_ratio)
+    model = LogisticRegression(C=C)
     model.fit(x_train, y_train)
     maskTest=(mainFrame.index.get_level_values(1) >= str(ii+1)+'-01-01') & (mainFrame.index.get_level_values(1) <= str(ii+1)+'-12-31')
     test=features[maskTest]

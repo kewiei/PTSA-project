@@ -20,7 +20,7 @@ import matplotlib.pyplot as plt
 idx=pd.IndexSlice
 from sklearn.metrics import make_scorer, r2_score,accuracy_score,precision_score
 from sklearn.externals import joblib
-from sklearn.model_selection import RandomizedSearchCV
+from sklearn.model_selection import GridSearchCV
 import gc
 from sklearn.gaussian_process import GaussianProcessClassifier
 from sklearn.gaussian_process.kernels import RBF,ExpSineSquared
@@ -49,7 +49,7 @@ params = {"kernel": [RBF(), ExpSineSquared()]}
 
 model = GaussianProcessClassifier()
 
-random = RandomizedSearchCV(model, params)
+random = GridSearchCV(model, params)
 
 random.fit(x_train, y_train)
 
