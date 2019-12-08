@@ -18,7 +18,7 @@ import matplotlib.pyplot as plt
 idx=pd.IndexSlice
 from sklearn.metrics import make_scorer, r2_score,accuracy_score,precision_score
 from sklearn.externals import joblib
-from sklearn.model_selection import RandomizedSearchCV
+from sklearn.model_selection import GridSearchCV
 import gc
 from sklearn.linear_model import LogisticRegression
 from sklearn import preprocessing
@@ -44,23 +44,19 @@ y_train=y_train*1
 y_train=y_train.astype(int)
 
 
-params = {"penalty": ["l1", "l2", "elasticnet"], "dual":[True, False], "fit_intercept": [True, False], "C": np.arange(1,5,0.5), "solver": ["newton-cg", "lbfgs", "liblinear", "sag", "saga"],"l1_ratio": np.arange(0,1.25,0.25)}
+params = {"C": np.arange(0,2,0.1),"n_jobs":[28]}
 
 model = LogisticRegression()
 
-random = RandomizedSearchCV(model, params)
+random = GridSearchCV(model, params)
 
 random.fit(x_train, y_train)
 
 best_params = random.best_params_
 
 #save parameters
-penalty = best_params["penalty"]
-dual = best_params["dual"]
-fit_intercept = best_params["fit_intercept"]
+
 C= best_params["C"]
-solver = best_params["solver"]
-l1_ratio = best_params["l1_ratio"]
 
 #Now we train, predict and save the predictions
 years = np.arange(2005, 2015)
