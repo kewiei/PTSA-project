@@ -130,6 +130,8 @@ playground.ipynb
 *.csv
 *.txt
 *.out
+*.xlsx
 Small.csv
 trancateDataset.ipynb
 mlp_result/
+!ml_metrics.csv
