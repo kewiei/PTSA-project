@@ -30,37 +30,39 @@ mainFrame=pd.read_csv(r'/beegfs/sr4376/Finance Data/CNN-LSTM Data/TransformedDat
 
 mainFrame.set_index(['entityID','Date'],inplace=True)
 mainFrame.sort_index(inplace=True)
+mainFrame = mainFrame.iloc[:,-10:]
 targets=mainFrame.iloc[:,-1:]
 features = mainFrame.iloc[:,:-1]
 gc.collect()
 
 '''first we do hyperparameter training, then save the hyperparamters and then train and predict all years'''
 
-maskTrain=(mainFrame.index.get_level_values(1)>= '2005-01-01') & (mainFrame.index.get_level_values(1)<= '2006-08-31') 
+# maskTrain=(mainFrame.index.get_level_values(1)>= '2005-01-01') & (mainFrame.index.get_level_values(1)<= '2006-08-31') 
 
-x_train=np.array(features[maskTrain])
-y_train=np.array(targets['ztargetMedian5'][maskTrain])
-x_train[np.isinf(x_train)]=100000000
-x_train=np.log(1+x_train)
-y_train=y_train*1
-y_train=y_train.astype(int)
+# x_train=np.array(features[maskTrain])
+# y_train=np.array(targets['ztargetMedian5'][maskTrain])
+# x_train[np.isinf(x_train)]=100000000
+# x_train=np.log(1+x_train)
+# y_train=y_train*1
+# y_train=y_train.astype(int)
 
 
-params = {"kernel": [RBF(), ExpSineSquared()]}
+# params = {"kernel": [RBF(), ExpSineSquared()]}
 
-model = GaussianProcessClassifier()
+model = GaussianProcessClassifier(n_jobs=28)
 
-random = GridSearchCV(model, params)
+# random = GridSearchCV(model, params)
 
-random.fit(x_train, y_train)
+# random.fit(x_train, y_train)
 
-best_params = random.best_params_
+# best_params = random.best_params_
 
-#save parameters
-kernel = best_params["kernel"]
+# save parameters
+# kernel = best_params["kernel"]
+# kernel = RBF()
 
 #Now we train, predict and save the predictions
-years = np.arange(2005, 2015)
+years = np.arange(2008, 2015)
 for ii in years:
     maskTrain=(mainFrame.index.get_level_values(1)>= str(ii)+'-01-01') & (mainFrame.index.get_level_values(1)<= str(ii)+'-12-31')
     x_train=np.array(features[maskTrain])
@@ -69,7 +71,9 @@ for ii in years:
     x_train=np.log(1+x_train)
     y_train=y_train*1
     y_train=y_train.astype(int)
-    model = GaussianProcessClassifier(kernel=kernel)
+    model = GaussianProcessClassifier(kernel=None)
+    print(np.shape(x_train))
+    print(np.shape(y_train))
     model.fit(x_train, y_train)
     maskTest=(mainFrame.index.get_level_values(1) >= str(ii+1)+'-01-01') & (mainFrame.index.get_level_values(1) <= str(ii+1)+'-12-31')
     test=features[maskTest]

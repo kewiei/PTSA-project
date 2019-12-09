@@ -20,10 +20,11 @@ endtime = time.time()
 print("It takes {}s to load data".format(endtime-starttime))
 
 # filePath = "logreg_result\LogRegPred{}basedon{}.csv"
-# filePath = "lstm_result\predRF{}yearsBack1.csv"
 # filePath = "mlp_result\mlp_predict{}basedon{}.csv"
 # filePath = r"xgboost_result\xgboost_predict{}basedon{}.csv"
-filePath = "rf_result\predRF{}yearsBack1.csv"
+# filePath = "lstm_result\predRF{}yearsBack1.csv"
+# filePath = "rf_result\predRF{}yearsBack1.csv"
+filePath = "cnnlstm_result\predRF{}yearsBack1.csv"
 
 pred = pd.DataFrame()
 for year in range(2008,2015):
@@ -39,11 +40,11 @@ pred.sort_index(inplace=True)
 # pred.rename(columns={'ztargetMedian5': '0'},inplace=True)
 print(pred)
 mainFrame = mainFrame.merge(pred,left_index=True,right_index=True)
-mainFrame['pred'] = mainFrame['1'].apply(lambda x: 1 if x>0.5 else 0)
+mainFrame['pred'] = mainFrame['0'].apply(lambda x: 1 if x>0.5 else 0)
 
 y_true=np.array(mainFrame["ztargetMedian5"])
 y_pred=np.array(mainFrame['pred'])
-y_score=np.array(mainFrame['1'])
+y_score=np.array(mainFrame['0'])
 accuracy = accuracy_score(y_true=y_true,y_pred=y_pred)
 precision = precision_score(y_true=y_true,y_pred=y_pred)
 recall = recall_score(y_true=y_true,y_pred=y_pred)
