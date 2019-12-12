@@ -46,7 +46,8 @@ def trainAndPredictOneYear(year):
     dvalid =xgb.DMatrix(x_test, label=y_test)
     # specify parameters via map
     watchlist = [(dvalid, 'eval'), (dtrain, 'train')]
-    param = {'booster': 'gbtree', 'colsample_bytree': 0.8500000000000001, 'eta': 0.1, 'eval_metric': 'auc', 'max_depth': 10, 'n_estimators': 150.0, 'objective': 'binary:logistic', 'seed': 314159265, 'silent': 1, 'subsample': 0.9500000000000001}    
+    # {'colsample_bytree': 0.26, 'eta': 0.05, 'max_depth': 15, 'n_estimators': 310.0, 'subsample': 0.68}
+    param = {'booster': 'gbtree', 'colsample_bytree': 0.26, 'eta': 0.05, 'eval_metric': 'auc', 'max_depth': 15, 'n_estimators': 310.0, 'objective': 'binary:logistic', 'seed': 314159265, 'silent': 1, 'subsample': 0.68}    
     num_round = 1
     #retrain the entire model
     param['tree_method'] = 'gpu_hist'

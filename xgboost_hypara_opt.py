@@ -79,21 +79,21 @@ def optimize(trials=None,
     # To learn more about XGBoost parameters, head to this page: 
     # https://github.com/dmlc/xgboost/blob/master/doc/parameter.md
     space = {
-        'n_estimators': hp.quniform('n_estimators', 30, 300, 10),
-        'eta': hp.quniform('eta', 0.025, 0.5, 0.025),
+        'n_estimators': hp.quniform('n_estimators', 30, 400, 10),
+        'eta': hp.quniform('eta', 0.025, 1, 0.025),
         # A problem with max_depth casted to float instead of int with
         # the hp.quniform method.
-        'max_depth':  hp.choice('max_depth', np.arange(1, 14, dtype=int)),
+        'max_depth':  hp.choice('max_depth', np.arange(1, 20, dtype=int)),
 #         'min_child_weight': hp.quniform('min_child_weight', 1, 6, 1),
-        'subsample': hp.quniform('subsample', 0.5, 1, 0.05),
+        'subsample': hp.quniform('subsample', 0.2, 1, 0.02),
 #         'gamma': hp.quniform('gamma', 0.5, 1, 0.05),
-        'colsample_bytree': hp.quniform('colsample_bytree', 0.5, 1, 0.05),
+        'colsample_bytree': hp.quniform('colsample_bytree', 0.2, 1, 0.02),
         'eval_metric': 'auc',
         'objective': 'binary:logistic',
         # Increase this number if you have more cores. Otherwise, remove it and it will default 
         # to the maxium number. 
 #       #'nthread': 3,
-        'booster': 'gbtree',
+        #'booster': 'gbtree',
         'tree_method': 'gpu_hist',
         'silent': 1,
         'seed': random_state
@@ -102,7 +102,7 @@ def optimize(trials=None,
         trials = Trials()
     # Use the fmin function from Hyperopt to find the best hyperparameters
     best = fmin(score, space, algo=tpe.suggest,
-                max_evals=100, 
+                max_evals=200, 
                 trials=trials)
     return best
 
