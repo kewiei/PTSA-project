@@ -135,3 +135,5 @@ Small.csv
 trancateDataset.ipynb
 mlp_result/
 !ml_metrics.csv
+trunc_lstm_data.*
+truth.*

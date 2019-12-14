@@ -29,7 +29,7 @@ def create_model(input_dims):
         layers.Dense(30, activation='relu',kernel_initializer='glorot_normal',bias_initializer='glorot_normal'),
         layers.BatchNormalization(momentum=0.9),
         layers.Dense(10, activation='relu',kernel_initializer='glorot_normal',bias_initializer='glorot_normal'),
-        layers.Dense(3, activation='sigmoid')
+        layers.Dense(3, activation='softmax')
     ])
     model.compile(optimizer=keras.optimizers.Adam(),
                  loss='categorical_crossentropy',
@@ -65,7 +65,10 @@ def trainAndPredictOneYear(year):
     result = model.predict(x_test)
     result_holder = targets.loc[maskTest,'ztargetTopDown5'].copy()
     result_holder = pd.DataFrame(result_holder)
-    result_holder.loc[:,'ztargetTopDown5'] = result
+    result_holder.rename(columns={"ztargetTopDown5":"0"},inplace=True)
+    result_holder["1"] = None
+    result_holder["2"] = None
+    result_holder.loc[:,['0','1','2']] = result
     result_holder.to_csv('mlp_multiclass_predict{}basedon{}.csv'.format(next_year,this_year))    
 
 for this_year in range(2005,2015):

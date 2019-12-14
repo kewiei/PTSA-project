@@ -79,7 +79,7 @@ def optimize(trials=None,
     # To learn more about XGBoost parameters, head to this page: 
     # https://github.com/dmlc/xgboost/blob/master/doc/parameter.md
     space = {
-        'n_estimators': hp.quniform('n_estimators', 30, 400, 10),
+        'n_estimators': hp.quniform('n_estimators', 30, 1000, 10),
         'eta': hp.quniform('eta', 0.025, 1, 0.025),
         # A problem with max_depth casted to float instead of int with
         # the hp.quniform method.
@@ -102,7 +102,7 @@ def optimize(trials=None,
         trials = Trials()
     # Use the fmin function from Hyperopt to find the best hyperparameters
     best = fmin(score, space, algo=tpe.suggest,
-                max_evals=200, 
+                max_evals=400, 
                 trials=trials)
     return best
 
